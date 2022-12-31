@@ -2,10 +2,10 @@ import {VStack, Image, Center, Text, Heading, ScrollView} from 'native-base';
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
 import BackgroundImg from '@assets/background.png';
 import LogoSvg from '@assets/logo.svg';
-import React from 'react';
 import {Input} from '@components/Input';
 import {Button} from '@components/Button';
 import { useNavigation } from '@react-navigation/native';
+
 
 export function SignIn() {
 

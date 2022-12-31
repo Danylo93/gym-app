@@ -1,7 +1,8 @@
 import { HStack, Text, Heading, VStack, Icon} from "native-base";
 import { TouchableOpacity} from 'react-native';
-import React from "react";
+import LogoutSvg from '@assets/logout.svg';
 import { UserPhoto } from "./UserPhoto";
+
 
 
 export function HomeHeader() {
@@ -22,7 +23,7 @@ export function HomeHeader() {
             </VStack>
 
             <TouchableOpacity>
-            <Text color='red.600' fontSize='md'>Sair</Text>
+            <LogoutSvg fill='white' width={20} height={20} />
             </TouchableOpacity>
             
 

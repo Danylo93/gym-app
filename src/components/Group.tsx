@@ -1,5 +1,5 @@
 import { Text, Pressable, IPressableProps} from "native-base";
-import React from "react";
+
 
 type Props = IPressableProps & {
     name: string;

@@ -1,5 +1,5 @@
 import { Image, IImageProps } from "native-base";
-import React from "react";
+
 
 type Props = IImageProps & {
     size : number;

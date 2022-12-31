@@ -1,8 +1,8 @@
 import { Heading, HStack, Image, Text, VStack, Icon} from 'native-base';
-import React from 'react';
+
 import  { TouchableOpacity, TouchableOpacityProps} from 'react-native';
 
-
+import ArrowSvg from '@assets/arrow-right.svg';
 
 type Props = TouchableOpacityProps & {
 
@@ -19,10 +19,10 @@ export function ExerciseCard({...rest}: Props) {
                 h={16}
                 rounded='md'
                 mr={4}
-                resizeMode='center'
+                resizeMode='cover'
  />
 
-            <VStack >
+            <VStack flex={1} >
                 <Heading fontSize='lg' color='white' >
                     Remada Unilateral
                 </Heading>
@@ -32,6 +32,7 @@ export function ExerciseCard({...rest}: Props) {
                 </Text>
             </VStack>
             
+            <ArrowSvg fill='white' width={20} height={20} />
             </HStack>
         </TouchableOpacity>
     )
