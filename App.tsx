@@ -1,11 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {Text, StatusBar} from 'react-native';
 import {NativeBaseProvider} from 'native-base';
-// import {
-//   useFonts,
-//   Roboto_400Regular,
-//   Roboto_700Bold,
-// } from '@expo-google-fonts/roboto';
+import { AuthContext } from '@contexts/AuthContext';
 import React from 'react';
 import {Loading} from '@components/Loading';
 import {THEME} from './src/theme';
@@ -21,8 +17,18 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
+      <AuthContext.Provider value={{
+       user: {
+        id: '1',
+        name: 'Danylo',
+        email: 'danylo@gmail.com',
+        avatar: 'danylo.png'
+       }
+      }}>
+        <Routes />
+      </AuthContext.Provider>
 
-      <Routes />
+     
     </NativeBaseProvider>
   );
 }

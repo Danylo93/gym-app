@@ -31,7 +31,7 @@ function handleNewAccount(){
           <LogoSvg />
 
           <Text color="gray.100" fontSize="sm">
-            Treine sua mente e seu corpo
+            Você em forma
           </Text>
         </Center>
 

@@ -43,7 +43,7 @@ export function Profile(){
             return;
         }
         if(photoSelected.assets[0].uri){
-          setUserPhoto(photoSelected.assets[0].uri);
+          setUserPhoto(photoSelected.assets[0].uri); 
           toast.show({
             title: 'Foto Atualizada com sucesso',
             placement: 'top',
@@ -98,7 +98,7 @@ export function Profile(){
                 </Center>
 
                 <Center px={10} mt={12} mb={9}>
-                    <Heading color='gray.200' fontSize='md' mb={2} alignSelf='flex-start' mt={8}>
+                    <Heading color='gray.200' fontSize='md' mb={2} alignSelf='flex-start' mt={8} fontFamily='heading'>
                         Alterar Senha
                     </Heading>
 
