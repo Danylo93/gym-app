@@ -1,15 +1,11 @@
 /* eslint-disable react/react-in-jsx-scope */
-import {Text, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import {NativeBaseProvider} from 'native-base';
-import { AuthContext } from '@contexts/AuthContext';
-import React from 'react';
-import {Loading} from '@components/Loading';
+import { AuthContextProvider } from '@contexts/AuthContext';
 import {THEME} from './src/theme';
-import {SignUp} from '@screens/SignUp';
 import { Routes } from '@routes/index';
-export default function App() {
-  // const [fontsLoaded] = useFonts({Roboto_400Regular, Roboto_700Bold});
 
+export default function App() {
   return (
     <NativeBaseProvider theme={THEME}>
       <StatusBar
@@ -17,16 +13,9 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      <AuthContext.Provider value={{
-       user: {
-        id: '1',
-        name: 'Danylo',
-        email: 'danylo@gmail.com',
-        avatar: 'danylo.png'
-       }
-      }}>
+      <AuthContextProvider>
         <Routes />
-      </AuthContext.Provider>
+      </AuthContextProvider>
 
      
     </NativeBaseProvider>

@@ -1,8 +1,6 @@
 import {VStack, Image, Center, Text, Heading, ScrollView, useToast} from 'native-base';
-import { useState} from 'react'
 import BackgroundImg from '@assets/background.png';
 import LogoSvg from '@assets/logo.svg';
-import axios from 'axios';
 import {Input} from '@components/Input';
 import {Button} from '@components/Button';
 import { useNavigation } from '@react-navigation/native';
@@ -10,8 +8,9 @@ import { useForm, Controller} from "react-hook-form";
 import * as yup from 'yup';
 import { yupResolver} from '@hookform/resolvers/yup';
 import { api } from '@services/api';
-import { Alert } from 'react-native';
 import { AppError } from '@utils/AppError';
+import { useState } from 'react';
+import { useAuth } from '@hooks/useAuth';
 
 type FormDataProps = {
   name: string;
@@ -29,8 +28,10 @@ const signUpSchema = yup.object({
 });
 
 export function SignUp() {
+  const [isLoading, setIsLoading] = useState(false);
 
   const toast = useToast();
+  const {signIn} = useAuth();
 
   const { control, handleSubmit, formState: {errors} } = useForm<FormDataProps>({
     resolver : yupResolver(signUpSchema)
@@ -45,10 +46,13 @@ function handleSignIn(){
 async function handleSignUp( { email, name, password}: FormDataProps){
 
   try {
-  const response = await api.post('/users', { email, name, password});
-  console.log(response.data);
+    setIsLoading(true);
+  await api.post('/users', { email, name, password});
+  await signIn(email, password);
+  
     
   } catch (error) {
+    setIsLoading(false);
     const isAppError = error instanceof AppError;
     const title = isAppError ? error.message : 'Não foi possível criar a conta. Tente novamente mais tarde'
     toast.show({
@@ -142,7 +146,7 @@ async function handleSignUp( { email, name, password}: FormDataProps){
           )}
           />
           
-          <Button title="Criar e acessar" onPress={handleSubmit(handleSignUp)}/>
+          <Button title="Criar e acessar" onPress={handleSubmit(handleSignUp)} isLoading={isLoading}/>
         </Center>
 
         <Button title="Voltar para o login" onPress={handleSignIn} variant="outline" mt={24} />
