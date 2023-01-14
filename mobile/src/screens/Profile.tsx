@@ -1,12 +1,12 @@
 import { ScreenHeader } from '@components/ScreenHeader';
 import { UserPhoto } from '@components/UserPhoto';
-import { TouchableOpacity } from 'react-native'
+import { Alert, TouchableOpacity } from 'react-native'
 import { Center, ScrollView, Text, VStack, Skeleton, Heading, useToast } from 'native-base';
 import { useState } from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
-import { CameraOptions, ImageLibraryOptions } from 'react-native-image-picker';
+import { CameraOptions, ImageLibraryOptions, launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { AppError } from '@utils/AppError';
 import { useAuth } from '@hooks/useAuth';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -50,28 +50,10 @@ type FormDataProps = {
   })
   
 
-const DEFAULT_OPTIONS: ImageLibraryOptions & CameraOptions = {
-    mediaType: 'photo',
-    videoQuality: 'high',
-    quality: 1,
-    maxWidth: 0,
-    maxHeight: 0,
-    includeBase64: true,
-    cameraType: 'back' && 'front',
-    selectionLimit: 1,
-    saveToPhotos: true,
-    durationLimit: 0,
-    includeExtra: true,
-    presentationStyle: 'overFullScreen',
-    
-  };
-
-  
-
 export function Profile(){
     const [isUpdating, setIsUpdating] = useState(false);
     const  [photoLoading, setPhotoLoading] = useState(false);
-
+    const [imageUser, setImageUser] = useState('');
     const toast = useToast();
     const { user, updateUserProfile } = useAuth();
     const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({ 
@@ -82,23 +64,59 @@ export function Profile(){
         resolver: yupResolver(profileSchema) 
       });
 
-    async function handleUserPhotoSelect(){
-        setPhotoLoading(true);
-        try {
+    
+    const handleImage = () => {
 
-        const photoSelected =  await ImagePicker.launchImageLibrary(DEFAULT_OPTIONS);
+      
+      
+      Alert.alert('Selecione', 'Informe de onde voce quer pegar a foto',
+        [
+          {
+            text: 'Galeria',
+            onPress: () => pickImageFromGallery(),
+            style: 'default'
+          },
+          {
+            text: 'Câmera',
+            onPress: () => pickImageFromCamera(),
+            style: 'default'
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => console.log('tratar depois')
+        }
+      )
+    }
 
-        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+    const pickImageFromGallery = async () => {
 
-        const photoFile = {
-          name: `${user.name}.${fileExtension}`.toLowerCase(),
-          uri: photoSelected.assets[0].uri,
-          type: `${photoSelected.assets[0].type}/${fileExtension}`
-        } as any;
+      try{
+      setPhotoLoading(true);
+      
+      const options : ImageLibraryOptions ={
+          mediaType: 'photo'
+      }
+      
+      const result = await launchImageLibrary(options)
+      console.log(result)
 
-        const userPhotoUploadForm = new FormData();
+      const fileExtension = result.assets[0].uri.split('.').pop();
 
-        userPhotoUploadForm.append('avatar', photoFile);
+      const photoFile = {
+        name: `${user.name}.${fileExtension}`.toLowerCase(),
+        uri: result.assets[0].uri,
+        type: `${result.assets[0].type}/${fileExtension}`
+      } as any;
+
+      const userPhotoUploadForm = new FormData();
+
+      if(result?.assets){
+          setImageUser(result.assets[0].uri)
+          return
+      }
+
+      userPhotoUploadForm.append('avatar', photoFile);
 
         const avatarUpdtedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
           headers: {
@@ -137,8 +155,83 @@ export function Profile(){
             setPhotoLoading(false);
         }
 
-        
+
     }
+
+    const pickImageFromCamera = async () => {
+      try{
+        setPhotoLoading(true);
+
+        const options : CameraOptions ={
+          mediaType: 'photo',
+          saveToPhotos: false,
+          cameraType: 'front',
+          quality: 1
+      }
+
+      const result = await launchCamera(options)
+      console.log(result)
+
+      if(result?.assets){
+          setImageUser(result.assets[0].uri)
+          return
+      }
+        const fileExtension = result.assets[0].uri.split('.').pop();
+  
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: result.assets[0].uri,
+          type: `${result.assets[0].type}/${fileExtension}`
+        } as any;
+  
+        const userPhotoUploadForm = new FormData();
+  
+        if(result?.assets){
+            setImageUser(result.assets[0].uri)
+            return
+        }
+  
+        userPhotoUploadForm.append('avatar', photoFile);
+  
+          const avatarUpdtedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+  
+          const userUpdated = user;
+  
+          userUpdated.avatar = avatarUpdtedResponse.data.avatar;
+  
+          await updateUserProfile(userUpdated);
+  
+          if(photoSelected.didCancel){
+              return;
+          }
+          if(photoSelected.assets[0].uri){
+            setUserPhoto(photoSelected.assets[0].uri); 
+            toast.show({
+              title: 'Foto Atualizada com sucesso',
+              placement: 'top',
+              bgColor: 'green.500'
+            })
+          }
+  
+          
+              
+          } catch (error) {
+              console.log(error);
+              toast.show({
+                  title: 'Erro ao atualizar foto',
+                  placement: 'bottom',
+                  bgColor: 'red.500'
+              })
+          }finally{
+              setPhotoLoading(false);
+          }
+
+    }
+
 
     async function handleProfileUpdate(data: FormDataProps) {
         try {
@@ -174,7 +267,7 @@ export function Profile(){
         <VStack flex={1}>
             <ScreenHeader title='Perfil' />
             <ScrollView contentContainerStyle={{ paddingBottom: 36 }}>
-        <Center mt={6} px={10}>
+        <Center mt={6} px={10} >
           {
             photoLoading ?
               <Skeleton 
@@ -196,17 +289,18 @@ export function Profile(){
               />
           }
           
-          <TouchableOpacity onPress={handleUserPhotoSelect}>
+          {/* <TouchableOpacity onPress={handleImage}>
             <Text color="green.500" fontWeight="bold" fontSize="md" mt={2} mb={8}>
               Alterar Foto
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <Controller 
             control={control}
             name="name"
             render={({ field: { value, onChange } }) => (
               <Input 
+                mt={6}
                 bg="gray.600" 
                 placeholder='Nome'
                 onChangeText={onChange}

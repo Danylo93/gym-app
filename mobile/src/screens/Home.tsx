@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { FlatList, Heading, HStack, Text, useToast, VStack, ScrollView } from 'native-base';
+import { FlatList, Heading, HStack, Text, useToast, VStack, ScrollView,Skeleton} from 'native-base';
 
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
@@ -14,8 +14,9 @@ import { AppNavigatorRoutesProps } from '@routes/app.routes';
 import { Loading } from '@components/Loading';
 
 export function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const  [groupsLoading, setGroupsLoading] = useState(false);
+  const  [exercisesLoading, setExercisesLoading] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState('antebraço');
@@ -29,8 +30,10 @@ export function Home() {
 
   async function fetchGroups() {
     try {
+      setGroupsLoading(true)
       const response = await api.get('/groups');
       setGroups(response.data);
+      
 
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -41,16 +44,18 @@ export function Home() {
         placement: 'top',
         bgColor: 'red.500'
       })
+    }finally{
+      setGroupsLoading(false)
     }
   }
 
   async function fecthExercisesByGroup() {
     try {
-      setIsLoading(true);
+      setExercisesLoading(true);
       const response = await api.get(`/exercises/bygroup/${groupSelected}`);
     //console.log(response.data);
       setExercises(response.data);
-
+      
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Não foi possível carregar os exercícios';
@@ -61,7 +66,7 @@ export function Home() {
         bgColor: 'red.500'
       })
     } finally {
-      setIsLoading(false);
+      setExercisesLoading(false);
     }
   }
 
@@ -84,11 +89,28 @@ export function Home() {
         data={groups}
         keyExtractor={item => item}
         renderItem={({ item }) => (
-          <Group 
+          <>
+           {
+            groupsLoading ?
+              <Skeleton 
+              mr={3}
+              w={24}
+              h={10}
+              bg="gray.600"
+              rounded="md"
+              startColor="gray.500"
+              endColor="gray.400"
+              />
+            :
+            <Group 
             name={item}
             isActive={groupSelected.toLocaleUpperCase() == item.toLocaleUpperCase()}
             onPress={() => setGroupSelected(item)}
           />
+          }
+           
+        </>
+          
         )}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -116,10 +138,30 @@ export function Home() {
             data={exercises}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
-              <ExerciseCard 
-                onPress={() => handleOpenExerciseDetails(item.id)}
-                data={item}
+              <>
+           {
+            exercisesLoading ?
+              <Skeleton
+              zIndex={1}
+              rounded="md"
+              mb={3}
+              h={20}
+              bg="gray.600"
+              startColor="gray.500"
+              endColor="gray.400"
+
               />
+            :
+            <ExerciseCard 
+            onPress={() => handleOpenExerciseDetails(item.id)}
+            data={item}
+          />
+          }
+           
+        </>
+
+
+              
             )}
             showsVerticalScrollIndicator={false}
             _contentContainerStyle={{

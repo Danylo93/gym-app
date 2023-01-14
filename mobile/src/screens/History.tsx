@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { HistoryCard } from '@components/HistoryCard';
 import { ScreenHeader } from '@components/ScreenHeader';
 
-import { Center, Heading, Text, VStack, SectionList, useToast } from 'native-base';
+import { Center, Heading, Text, VStack, SectionList, useToast, Skeleton } from 'native-base';
 import { useAuth } from '@hooks/useAuth';
 import { AppError } from '@utils/AppError';
 import { api } from '@services/api';
@@ -15,6 +15,7 @@ import { HistoryByDayDTO } from '@dtos/HistoryByDayDTO';
 export function History(){
 
     const [isLoading, setIsLoading] = useState(true);
+    const [isHistoryLoading, setHistoryIsLoading] = useState(true);
     const [exercises, setExercises] = useState<HistoryByDayDTO[]>([]);
   
     const toast = useToast();
@@ -22,7 +23,7 @@ export function History(){
   
     async function fetchHistory() {
       try {
-        setIsLoading(true);
+        setHistoryIsLoading(true);
         const response = await api.get('/history');
   
         setExercises(response.data);
@@ -37,7 +38,7 @@ export function History(){
           bgColor: 'red.500'
         });
       } finally {
-        setIsLoading(false);
+        setHistoryIsLoading(false);
       }
     }
 
@@ -51,13 +52,35 @@ export function History(){
         <VStack flex={1}>
            <ScreenHeader title='Histórico de Exercícios'/>
 
-           {
-        isLoading ? <Loading /> : (
-          exercises?.length > 0 ?
-            <SectionList 
+           
+        
+            {exercises.length > 0 ?
+              
+              <SectionList 
               sections={exercises}
               keyExtractor={item => item.id}
-              renderItem={({ item }) => <HistoryCard data={item} /> }
+              renderItem={({ item }) => 
+              
+              <>
+              {
+               isHistoryLoading ?
+              <Skeleton
+              w="full"
+              h={20}
+              px={5}
+              py={4} 
+              mb={3}  
+              rounded="md"
+              bg="gray.600"
+              startColor="gray.500"
+              endColor="gray.400"
+              />
+            :
+            <HistoryCard data={item} />
+          }
+          </>
+             
+            }
               renderSectionHeader={({ section }) => (
                 <Heading color="gray.200" fontSize="md" mt={10} mb={3} fontFamily="heading">
                   {section.title}
@@ -66,17 +89,18 @@ export function History(){
               px={8}
               contentContainerStyle={exercises.length === 0 && { flex: 1, justifyContent: 'center' }}
               showsVerticalScrollIndicator={false}
-            />
-          :
-            <Center flex={1}>
-              <Text color="gray.100" textAlign="center">
-                Não há exercícios registrados ainda. {'\n'}
-                Vamos fazer exercícios hoje?
-              </Text>
-            </Center>
-        )
+            />  :
+           <Center flex={1}>
+            <Text color="gray.100" textAlign="center">
+              Não há exercícios registrados ainda. {'\n'}
+              Vamos fazer exercícios hoje?
+            </Text>
+          </Center>}
+          
+           
         
-      }
+        
+      
           
         </VStack>
         
