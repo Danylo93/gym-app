@@ -31,7 +31,7 @@ export function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
 
   const toast = useToast();
-  const {signIn} = useAuth();
+  const {singIn} = useAuth();
 
   const { control, handleSubmit, formState: {errors} } = useForm<FormDataProps>({
     resolver : yupResolver(signUpSchema)
@@ -48,7 +48,7 @@ async function handleSignUp( { email, name, password}: FormDataProps){
   try {
     setIsLoading(true);
   await api.post('/users', { email, name, password});
-  await signIn(email, password);
+  await singIn(email, password);
   
     
   } catch (error) {
