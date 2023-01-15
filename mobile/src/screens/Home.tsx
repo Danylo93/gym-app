@@ -134,47 +134,45 @@ export function Home() {
               {exercises.length}
             </Text>
           </HStack>
-          <ScrollView>
-          <VStack>
-            <FlatList
-            scrollEnabled={true}
-            data={exercises}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <>
-           {
-            exercisesLoading ?
-              <Skeleton
-              zIndex={1}
-              rounded="md"
-              mb={3}
-              h={20}
-              bg="gray.600"
-              startColor="gray.500"
-              endColor="gray.400"
-
-              />
-            :
-            <ExerciseCard 
-            onPress={() => handleOpenExerciseDetails(item.id)}
-            data={item}
-          />
-          }
-           
-        </>
-
-
-              
-            )}
-            showsVerticalScrollIndicator={false}
-            _contentContainerStyle={{
-              paddingBottom: 20
-            }}
-          />
-          </VStack>
-          </ScrollView>
+          
+          
         </VStack>
       }
+      <ScrollView style={{ marginHorizontal: 20}}>
+        
+        <FlatList
+        data={exercises}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <>
+       {
+        exercisesLoading ?
+          <Skeleton
+          zIndex={1}
+          rounded="md"
+          mb={3}
+          h={20}
+          bg="gray.600"
+          startColor="gray.500"
+          endColor="gray.400"
+
+          />
+        :
+        <ExerciseCard 
+        onPress={() => handleOpenExerciseDetails(item.id)}
+        data={item}
+      />
+      }
+       
+    </>   
+        )}
+        showsVerticalScrollIndicator={false}
+        _contentContainerStyle={{
+          paddingBottom: 20
+        }}
+      />
+      
+      </ScrollView>
     </VStack>
   );
 }

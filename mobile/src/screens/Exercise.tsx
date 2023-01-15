@@ -1,4 +1,4 @@
-import { Center, Heading, HStack, Text, VStack, Image, Box, ScrollView, useToast } from 'native-base';
+import { Center, Heading, HStack, Text, VStack, Image, Box, ScrollView, useToast, Skeleton } from 'native-base';
 import ArrowSvg from '@assets/arrow-left.svg';
 import BodySvg from '@assets/body.svg';
 import SeriesSvg from '@assets/series.svg';
@@ -23,7 +23,7 @@ export function Exercise(){
   const [isLoading, setIsLoading] = useState(true);
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-
+  const  [exercisesLoading, setExercisesLoading] = useState(false);
   const route = useRoute();
   const toast = useToast();
 
@@ -35,7 +35,7 @@ export function Exercise(){
 
   async function fetchExerciseDetails() {
     try {
-      setIsLoading(true);
+      setExercisesLoading(true);
       const response = await api.get(`/exercises/${exerciseId}`);
 
       setExercise(response.data);
@@ -50,7 +50,7 @@ export function Exercise(){
         bgColor: 'red.500'
       })
     } finally {
-      setIsLoading(false);
+      setExercisesLoading(false);
     }
   }
 
@@ -107,10 +107,23 @@ export function Exercise(){
         </HStack>
 
            </VStack>
-           {isLoading ? <Loading /> : 
+           
         <VStack p={8}>
           <Box rounded="lg" mb={3} overflow="hidden">
-            <Image
+
+          {
+        exercisesLoading ?
+          <Skeleton
+          w="full"
+          h={80}
+          rounded="lg"
+          bg="gray.600"
+          startColor="gray.500"
+          endColor="gray.400"
+
+          />
+        :
+        <Image
               w="full"
               h={80}
               source={{ uri: `${api.defaults.baseURL}/exercise/demo/${exercise?.demo}` }}
@@ -118,6 +131,8 @@ export function Exercise(){
               resizeMode="cover"
               rounded="lg"
             />
+      }
+            
           </Box>
 
           <Box bg="gray.600" rounded="md" pb={4} px={4}>
@@ -146,7 +161,7 @@ export function Exercise(){
             />
           </Box>
         </VStack>
-      }
+      
         </VStack>
     )
 }

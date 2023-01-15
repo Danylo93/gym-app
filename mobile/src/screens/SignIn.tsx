@@ -75,10 +75,13 @@ async function handleNewAccount(){
           position="absolute"
         />
         <Center my={24}>
-          <LogoSvg />
+         
+          <Text color="gray.100" fontSize={40} fontWeight='bold'>
+            GymUp
+          </Text>
 
           <Text color="gray.100" fontSize="sm">
-            Você em forma
+          Um Upgrade para os seus treinos
           </Text>
         </Center>
 
