@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { FlatList, Heading, HStack, Text, useToast, VStack, ScrollView,Skeleton} from 'native-base';
-
+import { FlatList, Heading, HStack, Text, useToast, VStack,Skeleton} from 'native-base';
+import { ScrollView } from 'react-native-virtualized-view'
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
 import { ExerciseDTO } from '@dtos/ExerciseDTO';
@@ -134,7 +134,10 @@ export function Home() {
               {exercises.length}
             </Text>
           </HStack>
-          <FlatList 
+          <ScrollView>
+          <VStack>
+            <FlatList
+            scrollEnabled={true}
             data={exercises}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
@@ -168,7 +171,8 @@ export function Home() {
               paddingBottom: 20
             }}
           />
-
+          </VStack>
+          </ScrollView>
         </VStack>
       }
     </VStack>

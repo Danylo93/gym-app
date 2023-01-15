@@ -24,7 +24,7 @@ type APIInstanceProps = AxiosInstance & {
 }
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.28:3333',
+  baseURL: 'https://app-gym-up.herokuapp.com',
 }) as APIInstanceProps;
 
 let isRefreshing = false;
